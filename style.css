@@ -1,0 +1,44 @@
+<!-- File: static/css/style.css -->
+```css
+/* Reset & Base */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1e1e1e; color: #e5e5e5; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 1em; background: #282c34; }
+.header-left h1 { font-size: 1.5em; }
+.header-left label { margin-left: 1em; }
+.header-left select { margin-left: 0.5em; padding: 0.3em; }
+.header-right { width: 120px; }
+#face-container { width: 100%; height: auto; }
+.face-bg { fill: #61dafb; }
+.eye { fill: #fff; transition: transform 0.3s ease; }
+.mouth { fill: none; stroke: #fff; stroke-width: 5; stroke-linecap: round; }
+.face-interactive:hover .eye { transform: scale(1.2); }
+
+.tabs { display: flex; background: #20232a; }
+.tab-button { flex: 1; padding: 0.75em; background: none; border: none; color: #61dafb; cursor: pointer; transition: background 0.3s; }
+.tab-button.active, .tab-button:hover { background: #282c34; }
+
+main { padding: 1em; }
+.tab { display: none; }
+.tab.active { display: block; }
+
+.form-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em; margin-bottom: 1em; }
+.form-group label { min-width: 80px; }
+.form-group input, .form-group select { padding: 0.5em; border: 1px solid #444; border-radius: 4px; background: #1e1e1e; color: #e5e5e5; }
+button { padding: 0.5em 1em; border: none; border-radius: 4px; background: #61dafb; color: #20232a; cursor: pointer; }
+button:hover { background: #52c0e8; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+th, td { border: 1px solid #444; padding: 0.75em; }
+th { background: #282c34; }
+tbody tr:hover { background: #333; }
+
+.log { background: #121212; padding: 1em; border-radius: 4px; height: 200px; overflow-y: auto; font-family: monospace; margin-bottom: 1em; }
+.error-message { color: #ff6b6b; margin-top: 0.5em; }
+
+.spinner { width: 1em; height: 1em; border: 3px solid #444; border-top-color: #61dafb; border-radius: 50%; animation: spin 1s linear infinite; }
+.hidden { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Status Panel */
+#status-panel p { margin-bottom: 0.5em; }

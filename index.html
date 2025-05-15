@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minigotchi Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/static/css/face.css" />
+</head>
+<body>
+  <div class="container-fluid py-3">
+    <h1 class="text-center mb-4">Minigotchi Dashboard</h1><!-- Face Display -->
+<div class="text-center mb-3">
+  <div id="pwn-face" class="face happy">^_^</div>
+</div>
+
+<!-- Navigation Tabs -->
+<ul class="nav nav-tabs" id="tabMenu" role="tablist">
+  <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#scan">Scan</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#deauth">Deauth</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#brute">Brute</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#status">Status</button></li>
+</ul>
+
+<div class="tab-content mt-3">
+  <!-- Scan Tab -->
+  <div class="tab-pane fade show active" id="scan">
+    <button class="btn btn-primary" onclick="startScan()">Start Scan</button>
+    <ul id="scan-results" class="list-group mt-2"></ul>
+  </div>
+
+  <!-- Deauth Tab -->
+  <div class="tab-pane fade" id="deauth">
+    <button class="btn btn-danger" onclick="startDeauth()">Launch Deauth</button>
+    <pre id="deauth-log" class="mt-2"></pre>
+  </div>
+
+  <!-- Brute Tab -->
+  <div class="tab-pane fade" id="brute">
+    <div class="input-group mb-3">
+      <input id="brute-ip" type="text" class="form-control" placeholder="Target IP" />
+      <button class="btn btn-warning" onclick="startBrute()">Start Brute Force</button>
+    </div>
+    <div id="brute-output"></div>
+  </div>
+
+  <!-- Status Tab -->
+  <div class="tab-pane fade" id="status">
+    <canvas id="status-chart"></canvas>
+    <div class="mt-2">
+      <strong>CPU:</strong> <span id="cpu-val"></span>% | 
+      <strong>Memory:</strong> <span id="mem-val"></span>% | 
+      <strong>Packets:</strong> <span id="pkt-val"></span>
+    </div>
+  </div>
+</div>
+
+  </div>  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>  <script src="/static/js/face.js"></script>  <script>
+    const socket = io();
+
+    function startScan() {
+      fetch('/scan').then(res => res.json()).then(data => {
+        const list = document.getElementById('scan-results');
+        list.innerHTML = '';
+        data.networks.forEach(net => {
+          list.innerHTML += `<li class="list-group-item">${net.ssid} - ${net.signal}</li>`;
+        });
+        updateFace('excited');
+      });
+    }
+
+    function startDeauth() {
+      fetch('/deauth').then(res => res.json()).then(data => {
+        document.getElementById('deauth-log').innerText = data.log;
+        updateFace('angry');
+      });
+    }
+
+    function startBrute() {
+      const ip = document.getElementById('brute-ip').value;
+      fetch('/brute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('brute-output').innerText = data.result || data.error;
+        updateFace('serious');
+      });
+    }
+
+    const ctx = document.getElementById('status-chart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          { label: 'CPU', borderColor: 'red', data: [], fill: false },
+          { label: 'Memory', borderColor: 'blue', data: [], fill: false },
+          { label: 'Packets', borderColor: 'green', data: [], fill: false }
+        ]
+      },
+      options: {
+        scales: { x: { display: false }, y: { beginAtZero: true } }
+      }
+    });
+
+    socket.on('status_update', (data) => {
+      chart.data.labels.push("");
+      chart.data.datasets[0].data.push(data.cpu);
+      chart.data.datasets[1].data.push(data.memory);
+      chart.data.datasets[2].data.push(data.packets);
+      if (chart.data.labels.length > 20) {
+        chart.data.labels.shift();
+        chart.data.datasets.forEach(ds => ds.data.shift());
+      }
+      chart.update();
+
+      document.getElementById('cpu-val').innerText = data.cpu;
+      document.getElementById('mem-val').innerText = data.memory;
+      document.getElementById('pkt-val').innerText = data.packets;
+    });
+  </script></body>
+</html>

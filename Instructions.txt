@@ -1,0 +1,49 @@
+Installation & Setup Instructions
+
+1. Create and activate a virtual environment (recommended):
+
+
+
+python3 -m venv venv
+source venv/bin/activate
+
+2. Install dependencies:
+
+
+
+pip install -r requirements.txt
+
+3. Run the app with sudo (needed for iwlist and aireplay-ng commands):
+
+
+
+sudo python app.py
+
+4. Access the dashboard in your browser at:
+
+
+
+http://<your-device-ip>:5000/
+
+
+---
+
+Additional Notes
+
+Make sure your WiFi adapter is set up properly:
+
+Put the adapter in monitor mode if using deauth attacks (e.g., airmon-ng start wlan0)
+
+Confirm interface names (e.g., wlan0, wlan0mon) and update app.py accordingly.
+
+
+If you don’t want to run the entire app with sudo, configure sudoers to allow running iwlist and aireplay-ng without password prompts:
+
+
+sudo visudo
+
+Add lines like:
+
+yourusername ALL=(ALL) NOPASSWD: /sbin/iwlist, /usr/sbin/aireplay-ng
+
+Replace yourusername with your actual Linux username and paths to the commands with which iwlist and which aireplay-ng outputs.
